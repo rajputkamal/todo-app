@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import { LuListTodo } from "react-icons/lu";
 import { IoSettingsOutline, IoSearch } from "react-icons/io5";
