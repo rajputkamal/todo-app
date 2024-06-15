@@ -17,7 +17,8 @@ const StyledMainAppContainer = styled.section`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 600px;
+  width: auto;
+  max-width: 600px;
   margin: 0 auto;
 `
 
