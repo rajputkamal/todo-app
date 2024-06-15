@@ -14,7 +14,7 @@ type TodoItem = {
 
 const Main = () => {
   const [todos, setTodos] = useState<TodoItem[]>(() => {
-    const storedList = localStorage.getItem("todos");
+  const storedList = localStorage.getItem("todos");
     return storedList ? JSON.parse(storedList) : [];
   });
   const [input, setInput] = useState("");
