@@ -27,6 +27,7 @@ body {
   padding: 0;
   box-sizing: border-box;
   min-height: 100vh;
+  background-color: #0B0C10;
 }
 
 h1 {
