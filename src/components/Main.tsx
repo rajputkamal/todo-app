@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
-import styled, { css } from "styled-components";
+import { useEffect, useState } from "react";
+import styled, { css, keyframes } from "styled-components";
 import { LuListTodo } from "react-icons/lu";
 import { MdOutlineDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
@@ -12,10 +13,14 @@ type TodoItem = {
 };
 
 const Main = () => {
-  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [todos, setTodos] = useState<TodoItem[]>(() => {
+    const storedList = localStorage.getItem("todos");
+    return storedList ? JSON.parse(storedList) : [];
+  });
   const [input, setInput] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
+  const [deletingRow, setDeletingRow] = useState(null as number | null);
 
   const addTodoHandler = () => {
     if (input === "" || input.trim().length === 0) {
@@ -39,6 +44,8 @@ const Main = () => {
           completed: false,
         },
       ]);
+      setTimeout(() => {}, 1000);
+
       setInput("");
     }
   };
@@ -70,12 +77,13 @@ const Main = () => {
   }
 
   const deleteHandler = (id: number) => {
-    const filteredTodos = todos.filter((todo) => {
-      return todo.id !== id;
-    });
-
-    setTodos(filteredTodos);
-    setInput("");
+    setDeletingRow(id as number);
+    setTimeout(() => {
+      const filteredTodos = todos.filter((todo) => todo.id !== id);
+      setTodos(filteredTodos);
+      setInput("");
+      setDeletingRow(null);
+    }, 1000);
   };
 
   const editHandler = (todo: any) => {
@@ -91,6 +99,12 @@ const Main = () => {
       )
     );
   };
+
+  useEffect(() => {
+    if (todos) {
+      localStorage.setItem("todos", JSON.stringify(todos));
+    }
+  }, [todos]);
 
   return (
     <StyledMainContainer>
@@ -116,7 +130,7 @@ const Main = () => {
         <legend>My Day: {getTodaysDate()}</legend>
         {todos.map((todo) => {
           return (
-            <StyledTodoItems>
+            <StyledTodoItems animate={deletingRow === todo.id}>
               <StyledList>
                 <input
                   type="checkbox"
@@ -154,6 +168,23 @@ const Main = () => {
     </StyledMainContainer>
   );
 };
+const changeBackgroundColor = keyframes`
+  0% {
+    background-color: black;
+  }
+  100% {
+    background-color: #f0254d;
+  }
+`;
+
+const reduceWidth = keyframes`
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+`;
 
 const StyledMainContainer = styled.fieldset`
   position: relative;
@@ -181,14 +212,15 @@ const StyledIcon = styled.span<StyledIconProps>(
   ({ scale, type }) => css`
     scale: ${scale || 1.5};
     cursor: pointer;
+    transition: all ease-in-out 10s;
     &:hover {
       & svg {
+        transform: scale(1.2);
         fill: ${type === "delete"
-          ? "red"
+          ? "#f0254d"
           : type === "edit"
           ? "#66fcf1"
           : "none"};
-        transition: all ease-in-out 0.3s;
       }
     }
     &.disabledIcon {
@@ -246,7 +278,7 @@ const StyledListContainer = styled.fieldset`
   }
 `;
 
-const StyledLi = styled.li<{ completed: boolean }>(
+const StyledLi = styled.li<{ completed: any }>(
   ({ completed }) => css`
     text-decoration: ${completed ? "line-through" : ""};
   `
@@ -259,14 +291,20 @@ const StyledButton = styled.button`
   }
 `;
 
-const StyledTodoItems = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 12px;
-  margin-bottom: 8px;
-  background-color: #1f2833;
-`;
+const StyledTodoItems = styled.div<{ animate: boolean }>(
+  ({ animate }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 12px;
+    margin-bottom: 8px;
+    background-color: ${animate ? "#5c3739" : "#1f2833"};
+    animation-name: ${animate
+      ? `reduceWidth 1s linear forwards changeBackgroundColor 5s linear forwards`
+      : "none"};
+    overflow: hidden;
+  `
+);
 
 const StyledList = styled.div`
   display: flex;
