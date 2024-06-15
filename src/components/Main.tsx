@@ -186,6 +186,8 @@ const reduceWidth = keyframes`
   }
 `;
 
+console.log("Main.tsx", changeBackgroundColor, reduceWidth);
+
 const StyledMainContainer = styled.fieldset`
   position: relative;
   display: flex;
